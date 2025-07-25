@@ -1,16 +1,16 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { ImagePlus, Trash } from 'lucide-react'
-import { CldUploadWidget } from 'next-cloudinary'
+import { useCallback } from 'react'
+import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Trash } from 'lucide-react'
 
 interface ImageUploadProps {
    disabled?: boolean
-   onChange: (value: string) => void
-   onRemove: (value: string) => void
-   value: string[]
+   onChange: (file: File) => void
+   onRemove: () => void
+   value: string // image URL for preview
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -19,68 +19,58 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
    onRemove,
    value,
 }) => {
-   const [isMounted, setIsMounted] = useState(false)
+   const onDrop = useCallback(
+      (acceptedFiles: File[]) => {
+         if (acceptedFiles.length > 0) {
+            onChange(acceptedFiles[0])
+         }
+      },
+      [onChange]
+   )
 
-   useEffect(() => {
-      setIsMounted(true)
-   }, [])
-
-   const onUpload = (result: any) => {
-      onChange(result.info.secure_url)
-   }
-
-   if (!isMounted) {
-      return null
-   }
+   const { getRootProps, getInputProps, isDragActive } = useDropzone({
+      onDrop,
+      multiple: false,
+      accept: {
+         'image/*': [],
+      },
+      disabled,
+   })
 
    return (
-      <div>
-         <div className="mb-4 flex items-center gap-4">
-            {value.map((url) => (
-               <div
-                  key={url}
-                  className="relative w-[200px] h-[200px] rounded-md overflow-hidden"
-               >
-                  <div className="z-10 absolute top-2 right-2">
-                     <Button
-                        type="button"
-                        onClick={() => onRemove(url)}
-                        variant="destructive"
-                        size="sm"
-                     >
-                        <Trash className="h-4" />
-                     </Button>
-                  </div>
-                  <Image
-                     fill
-                     sizes="(min-width: 1000px) 30vw, 50vw"
-                     className="object-cover"
-                     alt="Image"
-                     src={url}
-                  />
-               </div>
-            ))}
-         </div>
-         <CldUploadWidget onUpload={onUpload} uploadPreset="l1mikcii">
-            {({ open }) => {
-               const onClick = () => {
-                  open()
-               }
-
-               return (
+      <div className="space-y-2">
+         {value ? (
+            <div className="relative w-[200px] h-[200px] rounded-md overflow-hidden">
+               <Image
+                  fill
+                  alt="Uploaded image"
+                  className="object-cover"
+                  src={value}
+               />
+               <div className="absolute top-2 right-2 z-10">
                   <Button
                      type="button"
-                     disabled={disabled}
-                     variant="secondary"
-                     onClick={onClick}
-                     className="flex gap-2"
+                     onClick={onRemove}
+                     variant="destructive"
+                     size="sm"
                   >
-                     <ImagePlus className="h-4" />
-                     <p>Upload an Image</p>
+                     <Trash className="h-4" />
                   </Button>
-               )
-            }}
-         </CldUploadWidget>
+               </div>
+            </div>
+         ) : (
+            <div
+               {...getRootProps()}
+               className={`border border-dashed p-6 rounded-md text-center cursor-pointer ${
+                  isDragActive ? 'bg-gray-100' : ''
+               }`}
+            >
+               <input {...getInputProps()} />
+               <p className="text-sm text-gray-600">
+                  Drag & drop an image here, or click to select a file
+               </p>
+            </div>
+         )}
       </div>
    )
 }
