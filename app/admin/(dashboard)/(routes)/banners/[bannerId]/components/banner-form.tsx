@@ -6,9 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
 import { Trash } from 'lucide-react'
-// import { Banner } from '@prisma/client'
+import { Banner } from '@prisma/client'
 import { useParams, useRouter } from 'next/navigation'
-
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,13 +21,11 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Heading } from '@/components/ui/heading'
 import ImageUpload from '@/components/ui/image-upload'
-import { Banner } from '@prisma/client'
-// import { AlertModal } from '@/components/modals/alert-modal'
-// import ImageUpload from '@/components/ui/image-upload'
+import { AlertModal } from '@/components/ui/alert-modal'
 
 const formSchema = z.object({
    label: z.string().min(1),
-   image: z.string().min(1),
+   image: z.any(),
 })
 
 type BannerFormValues = z.infer<typeof formSchema>
@@ -58,21 +55,47 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
    })
 
    const onSubmit = async (data: BannerFormValues) => {
+      console.log("Form submitted with data:", data) // ✅ check the data being submitted
       try {
          setLoading(true)
-         if (initialData) {
-            await fetch(`/api/banners/${params.bannerId}`, {
-               method: 'PATCH',
-               body: JSON.stringify(data),
-               cache: 'no-store',
-            })
-         } else {
-            await fetch(`/banners`, {
-               method: 'POST',
-               body: JSON.stringify(data),
-               cache: 'no-store',
-            })
+
+         let bannerImageUrl = initialData?.image || '';
+
+         if (data.image && data.image instanceof File) {
+            const formData = new FormData();
+            formData.append("file", data.image);
+
+            const response = await fetch('/api/upload', {
+               method: "POST",
+               body: formData,
+            });
+
+            const uploadRes = await response.json();
+
+            if (!response.ok) {
+               throw new Error(uploadRes.error || "Failed to upload Image");
+            }
+
+            data.image = uploadRes.url;
          }
+
+         const payload = {
+            label: data.label,
+            image: bannerImageUrl,
+         };
+
+         const endPoint = initialData
+            ? `/api/banners/${params.bannerId}`
+            : `/api/banners`;
+
+         await fetch(endPoint, {
+            method: initialData ? "PATCH": 'POST',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+         });
+
          router.refresh()
          router.push(`/banners`)
          toast.success(toastMessage)
@@ -107,12 +130,12 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
 
    return (
       <>
-         {/* <AlertModal
+         <AlertModal
             isOpen={open}
             onClose={() => setOpen(false)}
             onConfirm={onDelete}
             loading={loading}
-         /> */}
+         />
          <div className="flex items-center justify-between">
             <Heading title={title} description={description} />
             {initialData && (
@@ -140,9 +163,11 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
                         <FormLabel>Background image</FormLabel>
                         <FormControl>
                            <ImageUpload
-                              value={field.value ? [field.value] : []}
+                              value={
+                                 typeof field.value === 'string' ? field.value : ''
+                              }
                               disabled={loading}
-                              onChange={(url) => field.onChange(url)}
+                              onChange={(file) => field.onChange(file)} 
                               onRemove={() => field.onChange('')}
                            />
                         </FormControl>
