@@ -29,14 +29,29 @@
     "storybook": "turbo run storybook"
   },
   "devDependencies": {
+    "@e-commerce/eslint-config": "workspace:*",
+    "eslint": "^9.34.0",
     "husky": "^9.1.7",
+    "lint-staged": "^16.1.6",
     "prettier": "^3.6.2",
-    "tailwindcss": "2.2.19",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.20.5",
     "turbo": "^2.5.6",
     "typescript": "5.9.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "lint-staged": {
+    "(apps|packages)/**/*.{js,ts,jsx,tsx}": [
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ],
+    "packages/database/schema.prisma": [
+      "prisma format"
+    ]
+  },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "packageManager": "pnpm@9.0.0"
 }

@@ -1,11 +1,10 @@
-import { Button } from "@e-commerce/ui/button";
-import "./page.module.css";
+import {Button} from "@e-commerce/ui/Button"
 
 export default function Home() {
   return (
-    <div className="bg-slate-600">
-      <Button appName="dasdfds">
-        <div className="bg-red-400">safwan</div>
+    <div className="">
+      <Button href="/safwan">
+        safwan
         </Button>
     </div>
   );

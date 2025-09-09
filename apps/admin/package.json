@@ -1,7 +1,6 @@
 {
-  "name": "docs",
+  "name": "@e-commerce/admin",
   "version": "0.1.0",
-  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack --port 3001",
@@ -12,6 +11,7 @@
   },
   "dependencies": {
     "@e-commerce/ui": "workspace:*",
+    "@e-commerce/config-tailwind": "workspace:*",
     "next": "^15.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
@@ -19,6 +19,7 @@
   "devDependencies": {
     "@e-commerce/eslint-config": "workspace:*",
     "@e-commerce/typescript-config": "workspace:*",
+    "@e-commerce/config-tailwind": "workspace:*",
     "@types/node": "^22.15.3",
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",

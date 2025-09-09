@@ -1,0 +1,23 @@
+{
+  "name": "@e-commerce/lib",
+  "private": true,
+  "sideEffects": false,
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "clean": "rimraf .turbo node_modules .next coverage",
+    "lint": "eslint . --ext .ts,.js,.tsx,.jsx",
+    "lint:fix": "eslint . --ext .ts,.js,.tsx,.jsx --fix",
+    "test:dev": "vitest",
+    "test": "dotenv -e ../../.env -- vitest run"
+  },
+  "devDependencies": {
+    "@e-commerce/eslint-config": "workspace:*",
+    "@e-commerce/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.1"
+  }
+}

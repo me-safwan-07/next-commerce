@@ -2,8 +2,14 @@
   "name": "@e-commerce/typescript-config",
   "version": "0.0.0",
   "private": true,
-  "license": "MIT",
-  "publishConfig": {
-    "access": "public"
+  "sideEffects": false,
+  "scripts": {
+    "clean": "rimraf node_modules dist turbo"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.5",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "typescript": "5.4.5"
   }
 }
